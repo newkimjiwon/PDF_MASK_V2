@@ -17,7 +17,7 @@
   /* 공통 레이아웃 안정화 */
   *, *::before, *::after { box-sizing: border-box; }
 
-  /* ✅ 텍스트/셀렉트만 폭 100% 적용 */
+  /* 텍스트/셀렉트만 폭 100% 적용 */
   .field input[type="text"],
   .field select {
     display: block;
@@ -31,7 +31,7 @@
     -webkit-appearance: none;
   }
 
-  /* ✅ 파일 인풋은 기본 모양 유지 (원하지 않으면 이 블록은 생략 가능) */
+  /* 파일 인풋은 기본 모양 유지 (원하지 않으면 이 블록은 생략 가능) */
   .field input[type="file"] {
     display: inline-block;
     width: auto;
@@ -68,7 +68,7 @@
         {% endif %}
       </div>
 
-      <!-- 마스킹 옵션 (요청하신 내용 포함) -->
+      <!-- 마스킹 옵션 -->
       <div class="field">
         <label for="mode-fast">마스킹 방식</label>
         <select id="mode-fast" name="mode">
@@ -112,7 +112,7 @@
         {% endif %}
       </div>
 
-      <!-- 마스킹 옵션 (요청하신 내용 포함) -->
+      <!-- 마스킹 옵션 -->
       <div class="field">
         <label for="mode-accurate">마스킹 방식</label>
         <select id="mode-accurate" name="mode">
