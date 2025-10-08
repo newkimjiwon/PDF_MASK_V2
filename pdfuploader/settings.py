@@ -11,6 +11,8 @@ ALLOWED_HOSTS = [
     '.run.app',
     'localhost',
     '127.0.0.1',
+    'gnupdf.shop', 
+    'www.gnupdf.shop'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -33,7 +35,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'pdfuploader.urls'
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [BASE_DIR / 'templates'],  # ← 프로젝트 전역 템플릿 폴더
+    'DIRS': [BASE_DIR / 'templates'],  # 프로젝트 전역 템플릿 폴더
     'APP_DIRS': True,
     'OPTIONS': {'context_processors':[
         'django.template.context_processors.debug','django.template.context_processors.request',

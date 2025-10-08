@@ -1,4 +1,8 @@
 # upload/urls.py
+
+'''페이지 요청 발생 시 가장 먼저 호출되는 파일
+URL과 views.py 안의 함수를 연결하는 역할'''
+
 from django.urls import path
 from . import views
 

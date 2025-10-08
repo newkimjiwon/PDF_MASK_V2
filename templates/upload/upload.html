@@ -51,7 +51,12 @@
   <div class="card">
     <h2>빠른 변환</h2>
     <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
+      {% csrf_token %} <!--CSRF 공격에 대한 방어. 
+      CSRF란 사용자가 자신의 의지와는 무관하게 공격자가 의도한 행위(수정,삭제,등록 등)을 
+      특정 웹사이트에 요청하게 하는 공격
+      
+      POST 요청에 대해서만 csrf token을 발급하고 체크함. 
+      -->
 
       <!-- 파일 선택 -->
       <div class="field">

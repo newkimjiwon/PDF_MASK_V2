@@ -1,5 +1,6 @@
-from django.apps import AppConfig
+'''앱의 구성 정보를 정의하는 파일. '''
 
+from django.apps import AppConfig
 
 class UploadConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'

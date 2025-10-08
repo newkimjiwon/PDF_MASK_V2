@@ -1,5 +1,7 @@
 # upload/views.py
 
+'''앱의 기능 구현'''
+
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt

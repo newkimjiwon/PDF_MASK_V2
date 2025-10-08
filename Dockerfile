@@ -1,5 +1,7 @@
 # Dockerfile
 
+# DockerImage를 생성하기 위한 스크립트. 
+
 # 1. 베이스 이미지: 파이썬 3.9 버전이 설치된 가벼운 리눅스 환경으로 시작합니다.
 FROM python:3.12-slim
 

@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
+"""장고 명령어의 시작점
+내부에서 장고 세팅 모듈을 'pdfuploader.settings'로 지정.
+서버 실행 : python manage.py runserver """
 import os
 import sys
 
 
 def main():
-    """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pdfuploader.settings')
     try:
         from django.core.management import execute_from_command_line
