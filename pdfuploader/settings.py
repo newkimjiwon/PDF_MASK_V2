@@ -65,6 +65,8 @@ DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3','NAME': BASE_DIR
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
+STATIC_ROOT = BASE_DIR / 'staticfiles' 
+
 # 업로드 파일 설정
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

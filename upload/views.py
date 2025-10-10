@@ -25,7 +25,7 @@ def upload_form(request):
     if request.method == "GET":
         # 보여줄 html파일 경로
         return render(request, "upload/upload.html")
-
+    
     # POST
     f = request.FILES.get("file")
     if not f:
@@ -79,10 +79,12 @@ def upload_form(request):
     name_part, extension = os.path.splitext(original_filename)
     
     # 새로운 파일 이름 만들기
-    new_filename = f"{name_part}_masked{extension}"
+    new_filename = f"{name_part}_masked"
 	  # 다운로드 응답
     resp = HttpResponse(out_bytes, content_type="application/pdf")
-    resp["Content-Disposition"] = f'attachment; filename="{new_filename}"'
+    resp["Content-Disposition"] = f'attachment; filename="{new_filename}.pdf"'
+    
+    resp["X-Content-Type-Options"] = "nosniff"
     return resp
 
 
@@ -134,8 +136,9 @@ def mask_api(request):
     
     original_filename = f.name
     name_part, extension = os.path.splitext(original_filename)
-    new_filename = f"{name_part}_masked{extension}"
+    new_filename = f"{name_part}_masked"
     
     resp = HttpResponse(out_bytes, content_type="application/pdf")
     resp["Content-Disposition"] = f'attachment; filename="{new_filename}.pdf"'
+    resp["X-Content-Type-Options"] = "nosniff"
     return resp
