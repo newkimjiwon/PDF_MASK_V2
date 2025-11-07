@@ -6,6 +6,7 @@ URL과 views.py 안의 함수를 연결하는 역할'''
 from django.urls import path
 from . import views
 
+# 클라이언트가 접근하는 경로(엔드포인트) : "","health/"... -> views.XXX와 연결되어 XXX함수가 실행됨
 urlpatterns = [
     path("health/", views.health, name="health"),
     path("", views.upload_form, name="upload_form"),
