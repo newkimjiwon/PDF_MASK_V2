@@ -2,11 +2,7 @@
 from pathlib import Path
 import os
 
-# WSL에서 favicon.ico 출력하기
-if os.environ.get('WSL_DEV', 'False') == 'True':
-    DEBUG = True
-
-#최상위 폴더가 어디인지
+# 최상위 폴더가 어디인지
 BASE_DIR = Path(__file__).resolve().parent.parent 
 
 '''보안을 위한 암호화 키. 로컬 개발 시에는 SECRET_KEY라는 환경 변수 없으니까 뒤에 있는 임시 키를 사용함.
@@ -17,6 +13,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'some-default-secret-key-for-local-dev
 '''DEBUG 가 True이면 개발 모드. 오류 발생 시 자세한 디버깅 정보 보여줌. 
 						False이면 실제 서비스 모드. 사용자에게 간단한 오류 페이지만 보여줌. 자동으로 False'''
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+# WSL에서 favicon.ico 출력하기
+if os.environ.get('WSL_DEV', 'False') == 'True':
+    DEBUG = True
 
 # 이 웹사이트에서 접속을 허용할 도메인 주소 목록. 
 ALLOWED_HOSTS = [
