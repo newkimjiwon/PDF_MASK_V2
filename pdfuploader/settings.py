@@ -2,6 +2,10 @@
 from pathlib import Path
 import os
 
+# WSL에서 favicon.ico 출력하기
+if os.environ.get('WSL_DEV', 'False') == 'True':
+    DEBUG = True
+
 #최상위 폴더가 어디인지
 BASE_DIR = Path(__file__).resolve().parent.parent 
 
@@ -20,7 +24,8 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'gnupdf.com', 
-    'www.gnupdf.com' # 현재는 shop으로 등록했으나 com으로 바꿀예정임
+    'www.gnupdf.com', # 현재는 shop으로 등록했으나 com으로 바꿀예정임
+    '34.47.85.198'  # TEST SERVER
 ]
 # https환경에서 POST 요청을 보낼때, 해당 요청이 신뢰할 수 있는 출처에서 왔는지 검사
 CSRF_TRUSTED_ORIGINS = [
@@ -65,13 +70,12 @@ WSGI_APPLICATION = 'pdfuploader.wsgi.application'
 # 프로젝트가 사용할 데이터베이스 설정
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3','NAME': BASE_DIR / 'db.sqlite3',}} # DB 경로
 
-# 정적 파일 및 미디어 파일 설정
-STATIC_URL = 'static/'
+# 정적 파일 설정
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATIC_ROOT = BASE_DIR / 'staticfiles' 
-
-# 업로드 파일 설정
+# 미디어 파일
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
