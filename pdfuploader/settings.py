@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 ]
 # 여러 검문소 목록. 보안 등..
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # 반드시 맨 위
     'django.middleware.security.SecurityMiddleware','django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware','django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware','django.contrib.messages.middleware.MessageMiddleware',
@@ -79,6 +80,7 @@ else:
     STATICFILES_DIRS = []  # 운영 환경에서는 비활성화
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # 미디어 파일
 MEDIA_URL = '/media/'
