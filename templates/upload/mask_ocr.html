@@ -77,11 +77,20 @@ function pollStatus(jobId) {
 
             if (data.status === 'Completed') {
                 clearInterval(intervalId);
+
+                const downloadUrl = `/api/download/${jobId}/`;
+
                 statusDiv.className = 'mt-3 alert alert-success';
-                statusDiv.innerText = "분석 완료! 다운로드합니다.";
+                statusDiv.innerHTML = `
+                    <strong>변환 완료!</strong><br>
+                    다운로드를 하기 위해 아래 버튼을 누르세요.<br>
+                    <a href="${downloadUrl}" class="btn btn-success mt-2 w-100">
+                        📂 파일 다운로드 하기
+                    </a>
+                `;
                 
                 submitBtn.innerText = "처리 완료!";
-                window.location.href = `/api/download/${jobId}/`;
+
             } else if (data.status === 'Failed') {
                 clearInterval(intervalId);
                 showError("실패: " + data.message);
