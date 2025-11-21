@@ -20,6 +20,9 @@ services:
         condition: service_healthy
     networks:
       - default
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
 
   # 2. Redis Message Broker Service (Celery Broker)
   redis:
@@ -53,7 +56,8 @@ services:
         condition: service_healthy
     networks:
       - default
-
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 networks:
   default:
     name: pdf_mask_v2_default_net

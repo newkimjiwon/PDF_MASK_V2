@@ -38,7 +38,7 @@ def exec_get_job_file_path(job_id, filename):
 # =======================================================
 
 @shared_task(bind=True, name="ppt_to_pdf_task")
-def exec_ppt_to_pdf_task(self, job_id, in_path):
+def exec_ppt_to_pdf_task(self, job_id, in_path,original_filename):
     exec_update_job_status(job_id, 'PROCESSING')
     workdir = os.path.dirname(in_path)
     
@@ -71,6 +71,8 @@ def exec_ppt_to_pdf_task(self, job_id, in_path):
 
         pdf_name = os.path.splitext(os.path.basename(in_path))[0] + ".pdf"
         pdf_path = os.path.join(workdir, pdf_name)
+
+        download_name = os.path.splitext(original_filename)[0] + ".pdf"
         
         # 🚨 파일 존재 여부 최종 확인 (LibreOffice가 성공했다고 거짓말 했을 때)
         if not os.path.exists(pdf_path):
@@ -78,7 +80,7 @@ def exec_ppt_to_pdf_task(self, job_id, in_path):
             raise Exception(f"PDF file not produced. LibreOffice returned 0. Stdout: {completed.stdout.decode(errors='ignore')}. Stderr: {completed.stderr.decode(errors='ignore')}")
 
         exec_update_job_status(job_id, 'COMPLETED', result_path=pdf_path)
-        return pdf_path
+        return { "path" : pdf_path, "filename": download_name}
 
     except Exception as e:
         logger.error(f"PPT to PDF Task Failed for {job_id}: {e}")
@@ -93,7 +95,7 @@ def exec_ppt_to_pdf_task(self, job_id, in_path):
 # =======================================================
 
 @shared_task(bind=True, name="docx_to_pdf_task")
-def exec_docx_to_pdf_task(self, job_id, in_path):
+def exec_docx_to_pdf_task(self, job_id, in_path,original_filename):
     exec_update_job_status(job_id, 'PROCESSING')
     workdir = os.path.dirname(in_path)
     
@@ -121,12 +123,13 @@ def exec_docx_to_pdf_task(self, job_id, in_path):
 
         pdf_name = os.path.splitext(os.path.basename(in_path))[0] + ".pdf"
         pdf_path = os.path.join(workdir, pdf_name)
-        
+        download_name = os.path.splitext(original_filename)[0] + ".pdf"
+
         if not os.path.exists(pdf_path):
              raise Exception(f"PDF file not produced. LibreOffice returned 0. Stdout: {completed.stdout.decode(errors='ignore')}. Stderr: {completed.stderr.decode(errors='ignore')}")
             
         exec_update_job_status(job_id, 'COMPLETED', result_path=pdf_path)
-        return pdf_path
+        return { "path" : pdf_path, "filename": download_name}
 
     except Exception as e:
         logger.error(f"DOCX to PDF Task Failed for {job_id}: {e}")
@@ -142,7 +145,7 @@ def exec_docx_to_pdf_task(self, job_id, in_path):
 # =======================================================
 
 @shared_task(bind=True, name="mask_fast_task")
-def exec_mask_fast_task(self, job_id, in_path, opts):
+def exec_mask_fast_task(self, job_id, in_path, opts,original_filename):
     exec_update_job_status(job_id, 'PROCESSING')
     
     try:
@@ -159,9 +162,14 @@ def exec_mask_fast_task(self, job_id, in_path, opts):
         out_path = exec_get_job_file_path(job_id, result_filename)
         with open(out_path, 'wb') as out_f:
             out_f.write(out_bytes)
+        name_base, ext = os.path.splitext(original_filename)
+        download_name = f"{name_base}_masked{ext}"
 
         exec_update_job_status(job_id, 'COMPLETED', result_path=out_path)
-        return out_path
+        return {
+            "path": out_path,
+            "filename": download_name
+        }
         
     except Exception as e:
         logger.error(f"Fast Mask Task Failed for {job_id}: {e}")

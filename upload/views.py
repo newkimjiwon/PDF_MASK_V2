@@ -8,6 +8,7 @@ import uuid
 import shutil
 import tempfile
 from celery.result import AsyncResult # Celery 작업 상태 확인용
+from django.utils.encoding import escape_uri_path # 한글 파일명 처리용 
 
 
 from .tasks import (
@@ -107,7 +108,7 @@ def ppt_to_pdf(request):
     try:
         # 3. Celery Task 위임 (가장 중요!)
         # 무거운 연산은 Worker에게 맡기고 바로 반환합니다.
-        task_result = exec_ppt_to_pdf_task.apply_async(args=[job_id, in_path], task_id=job_id)# type: ignore
+        task_result = exec_ppt_to_pdf_task.apply_async(args=[job_id, in_path, f.name], task_id=job_id)# type: ignore
         logger.info(f"PPT to PDF job submitted: {job_id}, Celery ID: {task_result.id}")
 
         # 4. 즉시 응답 (사용자 대기 시간 없음)
@@ -145,7 +146,7 @@ def docx_to_pdf(request):
 
     # Celery Task 위임
     try:
-        task_result = exec_ppt_to_pdf_task.apply_async(args=[job_id, in_path], task_id=job_id)# type: ignore
+        task_result = exec_docx_to_pdf_task.apply_async(args=[job_id, in_path, f.name], task_id=job_id)# type: ignore
         logger.info(f"DOCX to PDF job submitted: {job_id}, Celery ID: {task_result.id}")
 
         # 즉시 응답
@@ -192,7 +193,7 @@ def mask_api(request):
 
     try:
         # Celery Task 위임
-        task_result = exec_ppt_to_pdf_task.apply_async(args=[job_id, in_path], task_id=job_id)# type: ignore
+        task_result = exec_mask_fast_task.apply_async(args=[job_id, in_path,opts, f.name], task_id=job_id)# type: ignore
         logger.info(f"Fast Mask job submitted: {job_id}, Celery ID: {task_result.id}")
 
         # 즉시 응답
@@ -209,7 +210,7 @@ def mask_api(request):
         return JsonResponse({"error": "Failed to submit job to queue. Check Redis/Celery connection."}, status=500)
 
 # =============================
-#         AI OCR Mask API (비동기 변경)
+#         AI OCR Mask API 
 # =============================
 @csrf_exempt
 def mask_ai_api(request):
@@ -226,7 +227,7 @@ def mask_ai_api(request):
 
     try:
     # Celery Task 위임
-        task_result = exec_ppt_to_pdf_task.apply_async(args=[job_id, in_path], task_id=job_id)# type: ignore
+        task_result = exec_mask_ai_ocr_task.apply_async(args=[job_id, in_path, f.name], task_id=job_id)# type: ignore
         logger.info(f"AI OCR Mask job submitted: {job_id}, Celery ID: {task_result.id}")
 
         # 즉시 응답
@@ -294,31 +295,44 @@ def get_job_status(request, job_id):
 # =============================
 
 @require_http_methods(["GET"])
+# download_result 함수 전체 수정
 def download_result(request, job_id):
     job_id = str(job_id)
     task = AsyncResult(job_id)
-
+    
     if task.status != 'SUCCESS':
-        return JsonResponse({"error": "Not ready"}, status=400)
-        
-    result_path = task.result
+        return JsonResponse({"error": "Job is not completed yet"}, status=400)
+    
+    # 👇 [수정] task.result가 이제 '경로'가 아니라 '꾸러미(dict)'입니다.
+    result_data = task.result 
+    
+    # 예전 버전 호환성을 위해 dict인지 확인
+    if isinstance(result_data, dict):
+        result_path = result_data['path']
+        original_name = result_data['filename']
+    else:
+        result_path = result_data
+        original_name = "converted.pdf" # 비상용 이름
+
     if not result_path or not os.path.exists(result_path):
-        return JsonResponse({"error": "File missing"}, status=404)
+        return JsonResponse({"error": "File not found"}, status=404)
 
     try:
-        # 1. 파일 내용을 메모리로 읽어옵니다.
-        with open(result_path, 'rb') as f:
+        with open(result_path, "rb") as f:
             file_data = f.read()
-            
-        # 2. 원본 파일과 폴더를 삭제합니다.
+
+        # 서버 청소
         job_dir = os.path.dirname(result_path)
         shutil.rmtree(job_dir, ignore_errors=True)
         
-        # 3. 사용자에게 파일 전송
-        filename = os.path.basename(result_path)
-        response = HttpResponse(file_data, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
-        return response
+        # 👇 [핵심] 한글 파일명 깨짐 방지 처리
+        encoded_filename = escape_uri_path(original_name)
         
+        response = HttpResponse(file_data, content_type='application/pdf')
+        # 파일명을 여기서 설정해줍니다.
+        response['Content-Disposition'] = f'attachment; filename="{encoded_filename}"'
+        return response
+
     except Exception as e:
-        return JsonResponse({"error": f"Error handling file: {e}"}, status=500)
+        logger.error(f"Download error: {e}")
+        return JsonResponse({"error": "Server error"}, status=500)

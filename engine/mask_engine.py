@@ -116,7 +116,10 @@ def mask_pdf_bytes(pdf_bytes: bytes, **opts) -> bytes:
         out.insert_pdf(src, from_page=pno, to_page=pno)
         marked = out[-1]
 
-        raw = page.get_text("rawdict") # type: ignore 
+        raw: dict = page.get_text("rawdict") # type: ignore 
+        # 👇 [디버깅용 로그 추가]
+        print(f"DEBUG: raw type is {type(raw)}") 
+        print(f"DEBUG: blocks count: {len(raw.get('blocks', []))}")
         rects = []
         for block in raw.get("blocks", []):
             if block.get("type") != 0: continue
